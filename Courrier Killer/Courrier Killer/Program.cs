@@ -17,7 +17,7 @@ namespace Courrier_Killer
         private static bool _loaded;
         private static Unit _fountain;
         private static void Main()
-        
+
         {
             Menu.AddItem(new MenuItem("Kill", "Auto kill enemy Couriers").SetValue(new KeyBind('I', KeyBindType.Toggle, false)).SetTooltip("auto AA enemy Couriers"));
             Menu.AddToMainMenu();
