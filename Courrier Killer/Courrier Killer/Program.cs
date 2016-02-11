@@ -23,8 +23,29 @@ namespace Courrier_Killer
             Menu.AddToMainMenu();
 
             Game.OnUpdate += Game_OnUpdate;
-            
         }
+
+        private static void On_Load(object sender, EventArgs e)
+        {
+            if (!_loaded)
+            {
+                if (!Game.IsInGame)
+                {
+                    return;
+                }
+                _loaded = true;
+            }
+
+            if (!Game.IsInGame)
+            {
+                _loaded = false;
+                return;
+            }
+
+        }
+
+
+
         private static void Game_OnUpdate(EventArgs args)
         {
 
@@ -36,11 +57,11 @@ namespace Courrier_Killer
 
             var me = ObjectMgr.LocalHero;
             var range = me.AttackRange;
-            var enemies = ObjectMgr.GetEntities<Hero>().Where(x => x.IsAlive && !x.IsIllusion && x.Team != me.Team).ToList();
-            
+            //var enemies = ObjectMgr.GetEntities<Hero>().Where(x => x.IsAlive && !x.IsIllusion && x.Team != me.Team).ToList();
+
             var couriers = ObjectMgr.GetEntities<Courier>().Where(x => x.IsAlive && x.Team != me.Team);
-           
-            
+
+
 
 
 
@@ -51,7 +72,6 @@ namespace Courrier_Killer
                     return;
                 }
                 _loaded = true;
-                _fountain = null;
             }
 
             if (!Game.IsInGame || me == null || couriers == null)
@@ -60,12 +80,16 @@ namespace Courrier_Killer
                 return;
             }
             if (Game.IsPaused) return;
-            foreach (var enemy in enemies)
+            //foreach (var enemy in enemies)
                 foreach (var courier in couriers)
-                    if (enemy.Distance2D(courier) < range)
+                    if (me.Distance2D(courier) < range && Menu.Item("Kill").GetValue<KeyBind>().Active)
                     {
-                        me.Attack(courier); }
+                        me.Attack(courier);
+                    }
         }
     }
 }
+    
+
+
 
