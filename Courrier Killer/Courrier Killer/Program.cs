@@ -64,7 +64,7 @@ namespace Courrier_Killer
 
 
 
-
+            //var heal = couriers.heal;
             var aa = me.MinimumDamage  ;
             //var heal = couriers.Mi ;
 

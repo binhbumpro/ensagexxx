@@ -21,6 +21,7 @@ namespace Born_To_Be_Phantom_Assasin
         private static Hero target;
         private static bool _loaded;
         private static string map;
+        private static bool dagger;
         private static float _myHull;
         private static AbilityToggler menuValue;
         //private static bool statechanged;
@@ -92,9 +93,9 @@ namespace Born_To_Be_Phantom_Assasin
             comboMenu.AddItem(
                 new MenuItem("SpellW", "Use Phantom Strike").SetValue(true));
             comboMenu.AddItem(
-                new MenuItem("Wrange", "Min range to use W").SetValue(new Slider(0, 10, 1000)));
+                new MenuItem("Wrange", "Min range to use W").SetValue(new Slider(1, 0, 1000)));
             comboMenu.AddItem(
-                new MenuItem("UseSatanic", "% Heal to use satanic").SetValue(new Slider(0, 10, 100)));
+                new MenuItem("UseSatanic", "% Heal to use satanic").SetValue(new Slider(1, 0, 100)));
             comboMenu.AddItem(
                 new MenuItem("targetsearchrange", "Target Search Range").SetValue(new Slider(1000, 128, 2500))
                     .SetTooltip("Radius of target search range around cursor."));
@@ -105,42 +106,45 @@ namespace Born_To_Be_Phantom_Assasin
         }
         private static void Game_OnUpdate(EventArgs args)
         {
-            target = me.ClosestToMouseTarget(Menu.Item("targetsearchrange").GetValue<Slider>().Value);
-            var distance = me.Distance2D(target);
-            //var bopby = Menu.Item("targetsearchrange").GetValue<Slider>().Value; // khoảng cách nắm bắt mục tiêu
-            var inv = me.Inventory.Items; // check hòm đồ
-            var enumerable = inv as Item[] ?? inv.ToArray();
-            var dagger = enumerable.Any(x => x.Name == "item_blink" && x.Cooldown == 0); // add blink
+
+            if (target == null) return;
             if (!_loaded)
             {
                 if (!Game.IsInGame || me == null || me.ClassID != ClassID.CDOTA_Unit_Hero_PhantomAssassin)
                 {
                     return;
                 }
-              
+            }
                 _loaded = true;
+
                 Game.PrintMessage(
                 "<font face='Comic Sans MS, cursive'><font color='#00aaff'>" + Menu.DisplayName + " By Bopby" +
                 " loaded!</font> <font color='#aa0000'>v" + Assembly.GetExecutingAssembly().GetName().Version,
                 MessageType.LogMessage);
-                if (target != null && Menu.Item("keyBind").GetValue<KeyBind>().Active == true) {
-                    SpellsUsage(me, target, distance, dagger);
-                }
-            }
-
-            if (!Game.IsInGame || me == null)
+                
+            
+            me = ObjectMgr.LocalHero;
+            target = me.ClosestToMouseTarget(Menu.Item("targetsearchrange").GetValue<Slider>().Value);
+            var handle = me.Handle;
+            var distance = me.Distance2D(target);
+            var inv = me.Inventory.Items;
+            var enumerable = inv as Item[] ?? inv.ToArray();
+            var dagger = enumerable.Any(x => x.Name == "item_blink" && x.Cooldown == 0);
+            if (!me.IsAlive) return
+                    ;
+            if (target != null && Menu.Item("keyBind").GetValue<KeyBind>().Active == true)
             {
-                _loaded = false;
-                return;
+                SpellsUsage(me, target, distance, dagger);
             }
-            if (Game.IsPaused) return;
-
-            if (!menuadded) return;
         }
+
+
+
         private static void SpellsUsage(Hero me, Hero target, double distance, bool daggerIsReady)
         {
             //var qrange = 1200;
             //var wrange = 1000;
+            
             var spellbook = me.Spellbook;
             var q = spellbook.SpellQ;
             var w = spellbook.SpellW;
