@@ -13,16 +13,17 @@ namespace Courrier_Killer
 {
     internal static class Program
     {
-        private static readonly Menu Menu = new Menu("Courier Owner Air13", "cb", true);
+        private static readonly Menu Menu = new Menu("Auto kill enemy Couriers", "ab", true);
         private static bool _loaded;
-        private static Unit _fountain;
         private static void Main()
 
         {
             Menu.AddItem(new MenuItem("Kill", "Auto kill enemy Couriers").SetValue(new KeyBind('I', KeyBindType.Toggle, false)).SetTooltip("auto AA enemy Couriers"));
+            //Menu.AddItem(new MenuItem("aa", "Number aa to kill").SetValue(new Slider(1, 1, 5)));
             Menu.AddToMainMenu();
 
             Game.OnUpdate += Game_OnUpdate;
+
         }
 
         private static void On_Load(object sender, EventArgs e)
@@ -57,12 +58,15 @@ namespace Courrier_Killer
 
             var me = ObjectMgr.LocalHero;
             var range = me.AttackRange;
-            //var enemies = ObjectMgr.GetEntities<Hero>().Where(x => x.IsAlive && !x.IsIllusion && x.Team != me.Team).ToList();
-
             var couriers = ObjectMgr.GetEntities<Courier>().Where(x => x.IsAlive && x.Team != me.Team);
 
+            //var enemies = ObjectMgr.GetEntities<Hero>().Where(x => x.IsAlive && !x.IsIllusion && x.Team != me.Team).ToList();
 
 
+
+
+            var aa = me.MinimumDamage  ;
+            //var heal = couriers.Mi ;
 
 
             if (!_loaded)
@@ -74,7 +78,7 @@ namespace Courrier_Killer
                 _loaded = true;
             }
 
-            if (!Game.IsInGame || me == null || couriers == null)
+            if (!Game.IsInGame || me == null)
             {
                 _loaded = false;
                 return;
@@ -82,7 +86,8 @@ namespace Courrier_Killer
             if (Game.IsPaused) return;
             //foreach (var enemy in enemies)
                 foreach (var courier in couriers)
-                    if (me.Distance2D(courier) < range && Menu.Item("Kill").GetValue<KeyBind>().Active)
+
+                    if (me.Distance2D(courier) <= range && Menu.Item("Kill").GetValue<KeyBind>().Active /*&& aa <= (Menu.Item("aa").GetValue<Slider>().Value)*/)
                     {
                         me.Attack(courier);
                     }
